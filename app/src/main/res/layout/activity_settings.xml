@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="?android:colorBackground">
+
+    <!-- Título -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Configuración"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="12dp"
+        android:textColor="?android:textColorPrimary" />
+
+    <!-- Botón Volver -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Volver"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="@android:color/darker_gray"
+        android:textColor="@android:color/white"
+        app:cornerRadius="12dp" />
+
+    <!-- Botón Borrar -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/dellogoutButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Borrar Datos y Cerrar Sesión"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/logout"
+        app:iconTint="@android:color/white"
+        app:iconGravity="textStart"
+        android:textColor="@android:color/white"
+        android:backgroundTint="?attr/colorPrimary"
+        android:layout_marginTop="16dp" />
+
+    <!-- Lista de Tareas -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpenMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="?attr/colorSecondary"
+        android:text="Ubicación"
+        android:textColor="@android:color/white"
+        app:cornerRadius="12dp"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconTint="@android:color/white" />
+
+    <!-- Botón Ver Mapa -->
+
+
+    <!-- Botón Cerrar Sesión -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/logoutButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cerrar Sesión"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="16dp"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/logout"
+        app:iconTint="@android:color/white"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@android:color/holo_red_dark" />
+</LinearLayout>
