@@ -8,19 +8,27 @@ import android.content.ContentValues
 class DBHelper(context: Context) : SQLiteOpenHelper(context, "TareasDB", null, 1) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(
-            """
-            CREATE TABLE IF NOT EXISTS tasks (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                description TEXT,
-                estado TEXT,
-                fecha TEXT
-            )
-            """.trimIndent()
+        val createTasksTable = """
+        CREATE TABLE tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            description TEXT,
+            estado TEXT,
+            fecha TEXT
         )
-    }
+    """.trimIndent()
 
+        val createUsersTable = """
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE,
+            password TEXT
+        )
+    """.trimIndent()
+
+        db.execSQL(createTasksTable)
+        db.execSQL(createUsersTable)
+    }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         db.execSQL("DROP TABLE IF EXISTS tasks")
         onCreate(db)
@@ -95,6 +103,48 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "TareasDB", null, 1
         val result = db.delete("tasks", "id = ?", arrayOf(id.toString()))
         return result > 0
     }
+
+    fun insertUser(username: String, encryptedPassword: String): Boolean {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("username", username)
+            put("password", encryptedPassword)
+        }
+        return db.insert("users", null, values) != -1L
+    }
+
+    fun authenticateUser(username: String, password: String): Boolean {
+        val db = readableDatabase
+        val query = "SELECT * FROM users WHERE username = ? AND password = ?"
+        val cursor = db.rawQuery(query, arrayOf(username, password))
+        val success = cursor.moveToFirst()
+        cursor.close()
+        return success
+    }
+
+    fun deleteUserByUsername(username: String): Boolean {
+        val db = writableDatabase
+        return db.delete("users", "username = ?", arrayOf(username)) > 0
+    }
+
+    fun deleteAllTasks(): Boolean {
+        val db = writableDatabase
+        return db.delete("tasks", null, null) > 0
+    }
+
+
+
+    fun getEncryptedPassword(username: String): String? {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT password FROM users WHERE username = ?", arrayOf(username))
+        var encrypted: String? = null
+        if (cursor.moveToFirst()) {
+            encrypted = cursor.getString(0)
+        }
+        cursor.close()
+        return encrypted
+    }
+
 }
 
 

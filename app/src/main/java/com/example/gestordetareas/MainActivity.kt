@@ -33,11 +33,9 @@ class MainActivity : AppCompatActivity() {
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
 
-        val savedEmail = sharedPreferences.getString("email", null)
-        val savedPassword = sharedPreferences.getString("password", null)
+        val username = sharedPreferences.getString("username", null)
 
-        if (savedEmail.isNullOrEmpty() || savedPassword.isNullOrEmpty()) {
-            // Si no hay sesión válida, redirigir al login
+        if (username.isNullOrEmpty()) {
             startActivity(Intent(this, LoginlocalActivity::class.java))
             finish()
             return

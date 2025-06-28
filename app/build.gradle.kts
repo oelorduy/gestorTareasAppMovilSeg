@@ -54,3 +54,16 @@ dependencies {
     implementation ("androidx.sqlite:sqlite:2.1.0")
     implementation ("androidx.security:security-crypto:1.1.0-alpha03")
 }
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "gestorTareas")
+        property("sonar.organization", "oelorduy") // Si usas SonarCloud
+        property("sonar.host.url", "http://localhost:9000") // o tu URL de Sonar
+        property("sonar.language", "kotlin")
+        property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.sources", "src/main")
+        property("sonar.tests", "src/test")
+        property("sonar.kotlin.detekt.reportPaths", "build/reports/detekt/detekt.xml")
+    }
+}

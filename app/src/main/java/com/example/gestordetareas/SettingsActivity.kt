@@ -2,26 +2,21 @@ package com.example.gestordetareas
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ListView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class SettingsActivity : AppCompatActivity() {
-
 
     private lateinit var dbHelper: DBHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 🔐 Verificación de sesión antes de cargar la interfaz
+        // Inicializar preferencias cifradas
         val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
         val sharedPreferences = EncryptedSharedPreferences.create(
             "secure_prefs",
@@ -31,11 +26,9 @@ class SettingsActivity : AppCompatActivity() {
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
 
-        val savedEmail = sharedPreferences.getString("email", null)
-        val savedPassword = sharedPreferences.getString("password", null)
-
-        if (savedEmail.isNullOrEmpty() || savedPassword.isNullOrEmpty()) {
-            // Si no hay sesión válida, redirigir al login
+        // Verificar que exista sesión
+        val savedUsername = sharedPreferences.getString("username", null)
+        if (savedUsername.isNullOrEmpty()) {
             startActivity(Intent(this, LoginlocalActivity::class.java))
             finish()
             return
@@ -43,18 +36,48 @@ class SettingsActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_settings)
 
-        val dellogoutButton = findViewById<MaterialButton>(R.id.dellogoutButton)
         val logoutButton = findViewById<Button>(R.id.logoutButton)
+        val dellogoutButton = findViewById<MaterialButton>(R.id.dellogoutButton)
         val mapButton = findViewById<Button>(R.id.btnOpenMap)
         val btnBack = findViewById<Button>(R.id.btnBack)
 
         dbHelper = DBHelper(this)
 
-
-       logoutButton.setOnClickListener {
+        //  Cerrar sesión sin borrar cuenta
+        logoutButton.setOnClickListener {
+            sharedPreferences.edit().remove("username").apply()
             Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, LoginlocalActivity::class.java))
+
+            val intent = Intent(this, LoginlocalActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
+
+        // 🗑 Eliminar usuario, tareas y cerrar sesión
+        dellogoutButton.setOnClickListener {
+            val username = sharedPreferences.getString("username", null)
+
+            if (!username.isNullOrEmpty()) {
+                val userDeleted = dbHelper.deleteUserByUsername(username)
+                val tasksDeleted = dbHelper.deleteAllTasks()
+
+                sharedPreferences.edit().clear().apply()
+
+                val msg = when {
+                    userDeleted && tasksDeleted -> "Usuario y tareas eliminados correctamente"
+                    userDeleted -> "Usuario eliminado, sin tareas registradas"
+                    else -> "Error al eliminar el usuario"
+                }
+
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "No hay sesión activa", Toast.LENGTH_SHORT).show()
+            }
+
+            val intent = Intent(this, LoginlocalActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
             finish()
         }
 
@@ -65,21 +88,5 @@ class SettingsActivity : AppCompatActivity() {
         btnBack.setOnClickListener {
             finish()
         }
-
-        dellogoutButton.setOnClickListener {
-                sharedPreferences.edit().clear().apply()
-                Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show()
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(Intent(this, LoginlocalActivity::class.java))
-                finish()
-
-        }
-
-
-
-
-
     }
-
-
 }
